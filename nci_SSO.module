@@ -1,8 +1,10 @@
 <?php
-require_once DRUPAL_ROOT .'/sites/crada-uat/modules/crada/crada_utilities.inc';
+/* TO DEBUG: Search and replace ////crada_log with //crada_log */
 
-crada_log("Here is the  _SERVER variable");
-crada_log(print_r($_SERVER, true));
+//require_once DRUPAL_ROOT .'/sites/crada-uat/modules/crada/crada_utilities.inc';
+
+//crada_log("Here is the  _SERVER variable");
+//crada_log(print_r($_SERVER, true));
 
 
 
@@ -160,7 +162,7 @@ function nci_SSO_init() {
     if($user && !user_is_anonymous()){
         return;
     }
-    crada_log(print_r($user, true));
+    //crada_log(print_r($user, true));
 
     //We expect the site to be protected, but we didn't get what we expected and login failed.
     //we want to display a 403 message to the user since the system was misconfigured.
@@ -430,7 +432,7 @@ function nci_SSO_form_alter(&$form, $form_state, $form_id) {
                     //Get user_org_rid
                 $query = "select name as role from users_roles ur, role r ";
                 $query .= "WHERE ur.rid=r.rid and ur.uid = {$user->uid} and ur.rid > 2; ";
-                crada_log($query);
+                //crada_log($query);
                 $result = db_query($query);
                 for ($count = 0; $row = $result->fetchObject(); $count++) {
                     $roles[] = $row->role;
@@ -574,28 +576,28 @@ function create_crada_roles($username, $http_user_org, $http_user_sub_org) {
     // Only add role if it exists
     // Attempting to add roles
     //
-    crada_log("create_crada_roles");
-    crada_log("username = $username, org=$http_user_org, sub_org=$http_user_sub_org");
+    //crada_log("create_crada_roles");
+    //crada_log("username = $username, org=$http_user_org, sub_org=$http_user_sub_org");
 
     $upper_user_org = strtoupper($http_user_org);
     $upper_user_sub_org = strtoupper($http_user_sub_org);
     //Get user id
     $query = "select uid from users where name = '{$username}'; ";
-    crada_log($query);
+    //crada_log($query);
     $result = db_query($query);
     $row = $result->fetchObject();
     $uid = $row->uid;
 
     //Get user_org_rid
     $query = "select rid as user_org_rid from role where upper(name) = '{$upper_user_org}'";
-    crada_log($query);
+    //crada_log($query);
     $result = db_query($query);
     $row = $result->fetchObject();
     $user_org_rid = $row->user_org_rid;
 
     //Get user_org_sub_rid
     $query = "select rid as user_sub_org_rid from role where upper(name) = '{$upper_user_sub_org}'";
-    crada_log($query);
+    //crada_log($query);
     $result = db_query($query);
     $row = $result->fetchObject();
     $user_sub_org_rid = $row->user_sub_org_rid;
@@ -604,14 +606,14 @@ function create_crada_roles($username, $http_user_org, $http_user_sub_org) {
         watchdog('SSO Login Add Role', "Adding $http_user_org role for user {$username}", NULL, WATCHDOG_INFO);
 
         $query = "INSERT ignore INTO users_roles (uid, rid) VALUES ({$uid}, {$user_org_rid});";
-        crada_log($query);
+        //crada_log($query);
         $result = db_query($query);
         //$row = $result->fetchObject();
     }
     if($user_sub_org_rid) {
         watchdog('SSO Login Add Role', "Adding $http_user_sub_org role for user $username", NULL, WATCHDOG_INFO);
         $query = "INSERT ignore INTO users_roles (uid, rid) VALUES ({$uid}, {$user_sub_org_rid});";
-        crada_log($query);
+        //crada_log($query);
         $result = db_query($query);
         //$row = $result->fetchObject();
     }
@@ -629,7 +631,7 @@ function _nci_SSO_login() {
     //observed for the current Drupal SSO Setup)
     if( !isset($_SERVER['HTTP_SM_AUTHTYPE']) || $_SERVER['HTTP_SM_AUTHTYPE'] != 'Form'){
         watchdog('SSO Login Failed', 'Page is not protected by SSO.', NULL, WATCHDOG_WARNING);
-        crada_log('Page is not protected by SSO');
+        //crada_log('Page is not protected by SSO');
         return NCI_SSO_ERROR_MISSING_AUTH_HEADER;
     }
     //Step 1. Get the SM_USER HTTP header
@@ -668,7 +670,7 @@ function _nci_SSO_login() {
                         //Attempt to add crada roles
                         create_crada_roles($username, $http_user_org, $http_user_sub_org);
                     }
-                    crada_log("ACCOUNT CREATED");
+                    //crada_log("ACCOUNT CREATED");
                     /*^^^ CRADA BRANCH CODE ABOVE ^^^*/
 
                     // Terminate if an error occurred during user_save().
@@ -688,12 +690,12 @@ function _nci_SSO_login() {
             }
 
             // Log user in.
-            crada_log("SSO Log User In");
-            crada_log("ACCOUNT");
-            crada_log(print_r($account, true));
+            //crada_log("SSO Log User In");
+            //crada_log("ACCOUNT");
+            //crada_log(print_r($account, true));
             $form_state['uid'] = $account->uid;
-            crada_log("form_state");
-            crada_log(print_r($form_state, true));
+            //crada_log("form_state");
+            //crada_log(print_r($form_state, true));
 
             user_login_submit(array(), $form_state);
 
@@ -744,7 +746,7 @@ function nci_SSO_user_presave(&$edit, $account, $category){
             {
                 $edit['mail'] = $email;
                 //load all other modules implementations of nci_SSO_user_presave.
-                crada_log('Load all other modules');
+                //crada_log('Load all other modules');
 
                 nci_SSO_module_invoke('insert_presave', $edit, $account, $category);
             }
